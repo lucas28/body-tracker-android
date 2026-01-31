@@ -6,6 +6,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -29,7 +34,11 @@ fun HistoryScreen(onBack: () -> Unit) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(16.dp),
+			.statusBarsPadding()
+			.navigationBarsPadding()
+			.imePadding()
+			.padding(16.dp)
+			.verticalScroll(rememberScrollState()),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
 		Text("Histórico de Progressão")
