@@ -37,11 +37,7 @@ import java.time.LocalDate
 import kotlin.math.max
 
 @Composable
-fun DashboardScreen(
-	onLogWorkout: () -> Unit,
-	onHistory: () -> Unit,
-	onSettings: () -> Unit
-) {
+fun DashboardScreen() {
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
 	val db = AppDatabase.get(ctx)
@@ -89,50 +85,9 @@ fun DashboardScreen(
 		})
 
 		Spacer(Modifier.height(8.dp))
-		Text("Adicionar refeição rápida")
-		OutlinedTextField(mealName, { mealName = it }, label = { Text("Nome") })
-		OutlinedTextField(mealKcal, { mealKcal = it }, label = { Text("Calorias (kcal)") })
-		OutlinedTextField(mealProtein, { mealProtein = it }, label = { Text("Proteína (g)") })
-		Button(onClick = {
-			val kcal = mealKcal.toIntOrNull() ?: 0
-			val prot = mealProtein.toDoubleOrNull() ?: 0.0
-			if (mealName.isNotBlank() && kcal > 0) {
-				scope.launch {
-					db.mealDao().insert(
-						MealEntry(
-							epochDay = today,
-							name = mealName,
-							calories = kcal,
-							proteinGrams = prot,
-							carbsGrams = 0.0,
-							fatGrams = 0.0
-						)
-					)
-					mealName = ""
-					mealKcal = ""
-					mealProtein = ""
-				}
-			}
-		}) { Text("Salvar refeição") }
-
-		Spacer(Modifier.height(12.dp))
-		Text("Refeições de hoje")
-		LazyColumn {
-			items(mealsToday, key = { it.id }) { meal ->
-				Column {
-					Text("${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
-					TextButton(onClick = { scope.launch { db.mealDao().deleteById(meal.id) } }) {
-						Text("Excluir")
-					}
-				}
-				Spacer(Modifier.height(8.dp))
-			}
-		}
-
-		Spacer(Modifier.height(12.dp))
-		Button(onClick = onLogWorkout) { Text("Registrar Treino") }
-		Button(onClick = onHistory) { Text("Histórico") }
-		Button(onClick = onSettings) { Text("Configurações") }
+		Spacer(Modifier.height(8.dp))
+		Text("Resumo semanal e do dia")
+		Text("Refeições hoje: ${mealsToday.size}")
 	}
 }
 

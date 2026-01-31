@@ -13,6 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 import com.bodyrecomptracker.navigation.AppNavHost
+import com.bodyrecomptracker.navigation.AppScaffold
 import com.bodyrecomptracker.ui.theme.BodyRecompTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			BodyRecompTheme {
 				Surface {
-					AppNavHost()
+					AppScaffold()
 				}
 			}
 		}
