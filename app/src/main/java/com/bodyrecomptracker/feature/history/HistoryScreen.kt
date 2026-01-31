@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -31,27 +29,24 @@ fun HistoryScreen(onBack: () -> Unit) {
 	val mealsToday = db.mealDao().observeMealsForDay(today).collectAsState(initial = emptyList()).value
 	val sessionsToday = db.workoutDao().observeSessionsForDay(today).collectAsState(initial = emptyList()).value
 
-	Column(
+	LazyColumn(
 		modifier = Modifier
 			.fillMaxSize()
 			.statusBarsPadding()
 			.navigationBarsPadding()
 			.imePadding()
-			.padding(16.dp)
-			.verticalScroll(rememberScrollState()),
+			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
-		Text("Histórico de Progressão")
-		Text("Refeições de hoje:")
-		LazyColumn {
-			items(mealsToday, key = { it.id }) { meal ->
-				Text("- ${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
-				Spacer(Modifier.height(4.dp))
-			}
+		item { Text("Histórico de Progressão") }
+		item { Text("Refeições de hoje:") }
+		items(mealsToday, key = { it.id }) { meal ->
+			Text("- ${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
+			Spacer(Modifier.height(4.dp))
 		}
-		Spacer(Modifier.height(12.dp))
-		Text("Treinos de hoje: ${sessionsToday.size}")
-		Button(onClick = onBack) { Text("Voltar") }
+		item { Spacer(Modifier.height(12.dp)) }
+		item { Text("Treinos de hoje: ${sessionsToday.size}") }
+		item { Button(onClick = onBack) { Text("Voltar") } }
 	}
 }
 

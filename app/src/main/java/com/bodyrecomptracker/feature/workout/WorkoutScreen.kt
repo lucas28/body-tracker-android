@@ -11,13 +11,20 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -27,9 +34,10 @@ import com.bodyrecomptracker.data.db.WorkoutSession
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-data class ExerciseInput(val name: String, var weightKg: String = "", var reps: String = "")
+data class ExerciseInput(val name: String, var weightKg: String = "", var reps: String = "10")
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun WorkoutScreen(onBack: () -> Unit) {
 	val defaultExercises = listOf(
 		"Supino reto", "Remada curvada", "Agachamento livre", "Levantamento terra", "Desenvolvimento militar"
@@ -39,13 +47,16 @@ fun WorkoutScreen(onBack: () -> Unit) {
 	val scope = rememberCoroutineScope()
 	val db = AppDatabase.get(ctx)
 
+	var currentDate by remember { mutableStateOf(LocalDate.now()) }
+	val epochDay get() = currentDate.toEpochDay()
+
 	LaunchedEffect(Unit) {
 		// Pré-preenche com última carga conhecida por exercício
 		defaultExercises.forEachIndexed { index, name ->
 			val last = db.workoutDao().findLastSetForExercise(name)
 			if (last != null) {
 				inputs[index].weightKg = if (last.weightKg > 0.0) last.weightKg.toString() else ""
-				inputs[index].reps = if (last.reps > 0) last.reps.toString() else ""
+				inputs[index].reps = if (last.reps > 0) last.reps.toString() else "10"
 			}
 		}
 	}
@@ -59,7 +70,12 @@ fun WorkoutScreen(onBack: () -> Unit) {
 			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
-		Text("Registro de Treino (PPL)")
+		Text("Registro de Treino (PPL) — ${currentDate}")
+		// Navegação por dia
+		Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+			Button(onClick = { currentDate = currentDate.minusDays(1) }) { Text("< Dia anterior") }
+			Button(onClick = { currentDate = currentDate.plusDays(1) }) { Text("Próximo dia >") }
+		}
 		LazyColumn(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -69,14 +85,36 @@ fun WorkoutScreen(onBack: () -> Unit) {
 			items(inputs, key = { it.name }) { item ->
 				Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
 					Text(item.name)
-					OutlinedTextField(value = item.weightKg, onValueChange = { item.weightKg = it }, label = { Text("Carga (kg)") })
-					OutlinedTextField(value = item.reps, onValueChange = { item.reps = it }, label = { Text("Repetições") })
+					// Dropdown de cargas (0..300 de 5 em 5)
+					var expanded by remember { mutableStateOf(false) }
+					ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+						OutlinedTextField(
+							readOnly = true,
+							value = item.weightKg.ifBlank { "Selecionar carga (kg)" },
+							onValueChange = {},
+							label = { Text("Carga (kg)") },
+							trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+							modifier = Modifier.menuAnchor()
+						)
+						val options = (0..300 step 5).map { it.toString() }
+						androidx.compose.material3.ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+							options.forEach { opt ->
+								DropdownMenuItem(
+									text = { Text("$opt kg") },
+									onClick = {
+										item.weightKg = opt
+										expanded = false
+									}
+								)
+							}
+						}
+					}
+					OutlinedTextField(value = item.reps, onValueChange = { item.reps = it }, label = { Text("Repetições (padrão 10)") })
 				}
 			}
 		}
 		Button(onClick = {
 			scope.launch {
-				val epochDay = LocalDate.now().toEpochDay()
 				val sessionId = db.workoutDao().insertSession(WorkoutSession(epochDay = epochDay, type = "PPL"))
 				val sets = inputs.mapNotNull { input ->
 					val w = input.weightKg.toDoubleOrNull() ?: 0.0

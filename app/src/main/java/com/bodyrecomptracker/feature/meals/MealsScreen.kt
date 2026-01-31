@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -41,50 +39,49 @@ fun MealsScreen() {
 	var mealKcal by remember { mutableStateOf("") }
 	var mealProtein by remember { mutableStateOf("") }
 
-	Column(
+	LazyColumn(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(16.dp)
-			.verticalScroll(rememberScrollState()),
+			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
-		Text("Refeições")
-		OutlinedTextField(mealName, { mealName = it }, label = { Text("Nome") })
-		OutlinedTextField(mealKcal, { mealKcal = it }, label = { Text("Calorias (kcal)") })
-		OutlinedTextField(mealProtein, { mealProtein = it }, label = { Text("Proteína (g)") })
-		Button(onClick = {
-			val kcal = mealKcal.toIntOrNull() ?: 0
-			val prot = mealProtein.toDoubleOrNull() ?: 0.0
-			if (mealName.isNotBlank() && kcal > 0) {
-				scope.launch {
-					db.mealDao().insert(
-						MealEntry(
-							epochDay = today,
-							name = mealName,
-							calories = kcal,
-							proteinGrams = prot,
-							carbsGrams = 0.0,
-							fatGrams = 0.0
+		item {
+			Text("Refeições")
+			OutlinedTextField(mealName, { mealName = it }, label = { Text("Nome") })
+			OutlinedTextField(mealKcal, { mealKcal = it }, label = { Text("Calorias (kcal)") })
+			OutlinedTextField(mealProtein, { mealProtein = it }, label = { Text("Proteína (g)") })
+			Button(onClick = {
+				val kcal = mealKcal.toIntOrNull() ?: 0
+				val prot = mealProtein.toDoubleOrNull() ?: 0.0
+				if (mealName.isNotBlank() && kcal > 0) {
+					scope.launch {
+						db.mealDao().insert(
+							MealEntry(
+								epochDay = today,
+								name = mealName,
+								calories = kcal,
+								proteinGrams = prot,
+								carbsGrams = 0.0,
+								fatGrams = 0.0
+							)
 						)
-					)
-					mealName = ""
-					mealKcal = ""
-					mealProtein = ""
-				}
-			}
-		}) { Text("Salvar refeição") }
-
-		Spacer(Modifier.height(12.dp))
-		LazyColumn {
-			items(mealsToday, key = { it.id }) { meal ->
-				Column {
-					Text("${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
-					TextButton(onClick = { scope.launch { db.mealDao().deleteById(meal.id) } }) {
-						Text("Excluir")
+						mealName = ""
+						mealKcal = ""
+						mealProtein = ""
 					}
 				}
-				Spacer(Modifier.height(8.dp))
+			}) { Text("Salvar refeição") }
+			Spacer(Modifier.height(12.dp))
+			Text("Hoje")
+		}
+		items(mealsToday, key = { it.id }) { meal ->
+			Column {
+				Text("${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
+				TextButton(onClick = { scope.launch { db.mealDao().deleteById(meal.id) } }) {
+					Text("Excluir")
+				}
 			}
+			Spacer(Modifier.height(8.dp))
 		}
 	}
 }
