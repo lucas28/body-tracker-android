@@ -48,7 +48,6 @@ fun WorkoutScreen(onBack: () -> Unit) {
 	val db = AppDatabase.get(ctx)
 
 	var currentDate by remember { mutableStateOf(LocalDate.now()) }
-	val epochDay get() = currentDate.toEpochDay()
 
 	LaunchedEffect(Unit) {
 		// Pré-preenche com última carga conhecida por exercício
@@ -115,7 +114,7 @@ fun WorkoutScreen(onBack: () -> Unit) {
 		}
 		Button(onClick = {
 			scope.launch {
-				val sessionId = db.workoutDao().insertSession(WorkoutSession(epochDay = epochDay, type = "PPL"))
+				val sessionId = db.workoutDao().insertSession(WorkoutSession(epochDay = currentDate.toEpochDay(), type = "PPL"))
 				val sets = inputs.mapNotNull { input ->
 					val w = input.weightKg.toDoubleOrNull() ?: 0.0
 					val r = input.reps.toIntOrNull() ?: 0
