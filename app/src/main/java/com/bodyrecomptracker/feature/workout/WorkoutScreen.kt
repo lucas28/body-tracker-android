@@ -19,6 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -175,6 +179,14 @@ fun WorkoutScreen(onBack: () -> Unit) {
 							value = item.weightKg.ifBlank { "Selecionar carga (kg)" },
 							onValueChange = {},
 							label = { Text("Carga (kg)") },
+							trailingIcon = {
+								IconButton(onClick = { expanded = !expanded }) {
+									androidx.compose.material3.Icon(
+										imageVector = if (expanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+										contentDescription = null
+									)
+								}
+							},
 							modifier = Modifier
 								.fillMaxWidth()
 								.clickable { expanded = true }
