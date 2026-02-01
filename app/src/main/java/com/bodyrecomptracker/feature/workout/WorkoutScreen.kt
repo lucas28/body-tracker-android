@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +45,7 @@ import com.bodyrecomptracker.data.db.ExerciseSet
 import com.bodyrecomptracker.data.db.WorkoutSession
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.bodyrecomptracker.ui.components.AppCard
 
 data class ExerciseInput(val name: String, var weightKg: String = "", var reps: String = "10")
 
@@ -167,7 +169,7 @@ fun WorkoutScreen(onBack: () -> Unit) {
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			items(inputs, key = { it.name }) { item ->
-				Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+				AppCard {
 					Text(item.name)
 					// DropdownMenu padrão ancorado a um TextField clicável
 					var expanded by remember { mutableStateOf(false) }
@@ -228,7 +230,7 @@ fun WorkoutScreen(onBack: () -> Unit) {
 				}
 				onBack()
 			}
-		}) { Text("Salvar e voltar") }
+		}, modifier = Modifier.fillMaxWidth()) { Text("Salvar Treino") }
 	}
 }
 

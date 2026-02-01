@@ -26,6 +26,10 @@ import com.bodyrecomptracker.data.db.AppDatabase
 import com.bodyrecomptracker.data.db.MealEntry
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.bodyrecomptracker.ui.components.AppCard
+import com.bodyrecomptracker.ui.theme.BlueProtein
+import com.bodyrecomptracker.ui.theme.OrangeCarb
+import com.bodyrecomptracker.ui.theme.YellowFat
 
 @Composable
 fun MealsScreen() {
@@ -49,12 +53,13 @@ fun MealsScreen() {
 	) {
 		item {
 			Text("Refeições")
-			OutlinedTextField(mealName, { mealName = it }, label = { Text("Nome") })
-			OutlinedTextField(mealKcal, { mealKcal = it }, label = { Text("Calorias (kcal)") })
-			OutlinedTextField(mealProtein, { mealProtein = it }, label = { Text("Proteína (g)") })
-			OutlinedTextField(mealCarbs, { mealCarbs = it }, label = { Text("Carboidratos (g)") })
-			OutlinedTextField(mealFat, { mealFat = it }, label = { Text("Gorduras (g)") })
-			Button(onClick = {
+			AppCard {
+				OutlinedTextField(mealName, { mealName = it }, label = { Text("Nome") })
+				OutlinedTextField(mealKcal, { mealKcal = it }, label = { Text("Calorias (kcal)") })
+				OutlinedTextField(mealProtein, { mealProtein = it }, label = { Text("Proteína (g)") })
+				OutlinedTextField(mealCarbs, { mealCarbs = it }, label = { Text("Carboidratos (g)") })
+				OutlinedTextField(mealFat, { mealFat = it }, label = { Text("Gorduras (g)") })
+				Button(onClick = {
 				val kcal = mealKcal.toIntOrNull() ?: 0
 				val prot = mealProtein.toDoubleOrNull() ?: 0.0
 				val carbs = mealCarbs.toDoubleOrNull() ?: 0.0
@@ -79,15 +84,17 @@ fun MealsScreen() {
 					}
 				}
 			}) { Text("Salvar refeição") }
+			}
 			Spacer(Modifier.height(12.dp))
 			Text("Hoje")
 		}
 		items(mealsToday, key = { it.id }) { meal ->
-			Column {
-				Text("${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
-				TextButton(onClick = { scope.launch { db.mealDao().deleteById(meal.id) } }) {
-					Text("Excluir")
-				}
+			AppCard {
+				Text("${meal.name}: ${meal.calories} kcal")
+				Text("${meal.proteinGrams.toInt()} g", color = BlueProtein)
+				Text("${meal.carbsGrams.toInt()} g", color = OrangeCarb)
+				Text("${meal.fatGrams.toInt()} g", color = YellowFat)
+				TextButton(onClick = { scope.launch { db.mealDao().deleteById(meal.id) } }) { Text("Excluir") }
 			}
 			Spacer(Modifier.height(8.dp))
 		}

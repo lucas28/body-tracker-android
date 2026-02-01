@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -40,6 +39,11 @@ import com.bodyrecomptracker.domain.TmbInput
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlin.math.max
+import com.bodyrecomptracker.ui.components.AppCard
+import com.bodyrecomptracker.ui.components.Gauge
+import com.bodyrecomptracker.ui.theme.BlueProtein
+import com.bodyrecomptracker.ui.theme.GreenCalories
+import com.bodyrecomptracker.ui.components.LineChart
 
 @Composable
 fun DashboardScreen() {
@@ -81,18 +85,31 @@ fun DashboardScreen() {
 			.verticalScroll(rememberScrollState()),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
-		Text("Resumo do Dia")
-		Text("Meta de déficit: -500 kcal")
-		Text("Calorias: $totalsCalories / $targetCalories kcal")
-		LinearProgressIndicator(progress = {
-			if (targetCalories > 0) (totalsCalories.coerceAtMost(targetCalories).toFloat() / targetCalories.toFloat())
-			else 0f
-		})
-		Text("Proteína: ${totalProtein.toInt()}g / ${targetProtein}g (faixa: $protLow-$protHigh)")
-		LinearProgressIndicator(progress = {
-			if (targetProtein > 0) (totalProtein.coerceAtMost(targetProtein.toDouble()).toFloat() / targetProtein.toFloat())
-			else 0f
-		})
+		Text("Dashboard")
+		AppCard {
+			Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+				Column {
+					Gauge(
+						progress = if (targetCalories > 0) (totalsCalories.toFloat() / targetCalories).coerceIn(0f, 1f) else 0f,
+						color = GreenCalories,
+						modifier = Modifier.size(120.dp)
+					)
+					Spacer(Modifier.height(8.dp))
+					Text("Calorias")
+					Text("$totalsCalories / $targetCalories kcal")
+				}
+				Column {
+					Gauge(
+						progress = if (targetProtein > 0) (totalProtein.toFloat() / targetProtein).coerceIn(0f, 1f) else 0f,
+						color = BlueProtein,
+						modifier = Modifier.size(120.dp)
+					)
+					Spacer(Modifier.height(8.dp))
+					Text("Proteína")
+					Text("${totalProtein.toInt()} / $targetProtein g")
+				}
+			}
+		}
 
 		Spacer(Modifier.height(8.dp))
 		Spacer(Modifier.height(8.dp))
@@ -100,13 +117,13 @@ fun DashboardScreen() {
 		Text("Refeições hoje: ${mealsToday.size}")
 
 		Spacer(Modifier.height(12.dp))
-		Text("Últimos 7 dias: Calorias vs Meta (-500) e treino")
-		WeeklyCaloriesChart(
-			target = targetCalories,
-			meals = meals7,
-			sessions = sessions7,
-			startEpochDay = start7
-		)
+		Text("Gráfico Semanal")
+		AppCard {
+			val days = (0..6).map { start7 + it }
+			val caloriesByDay = days.map { day -> meals7.filter { it.epochDay == day }.sumOf { it.calories } }
+			val norm = caloriesByDay.map { if (targetCalories > 0) (it.toFloat() / targetCalories).coerceIn(0f, 1.2f) else 0f }
+			LineChart(points = norm, lineColor = GreenCalories)
+		}
 	}
 }
 

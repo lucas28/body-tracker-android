@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavDestination
@@ -61,7 +62,7 @@ fun AppScaffold() {
 	Scaffold(
 		bottomBar = {
 			if (showBottomBar) {
-				NavigationBar {
+				NavigationBar(containerColor = com.bodyrecomptracker.ui.theme.DarkSurface) {
 					bottomItems.forEach { item ->
 						val selected = currentDestination.isTopLevel(item.route, navController)
 						NavigationBarItem(
@@ -76,7 +77,8 @@ fun AppScaffold() {
 								}
 							},
 							icon = item.icon,
-							label = { androidx.compose.material3.Text(item.label) }
+							label = { androidx.compose.material3.Text(item.label) },
+							colors = NavigationBarItemDefaults.colors()
 						)
 					}
 				}

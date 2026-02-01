@@ -15,6 +15,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -47,8 +49,22 @@ fun SettingsScreen(onBack: () -> Unit) {
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
 		Text("Configurações")
-		OutlinedTextField(proteinTarget.value, { proteinTarget.value = it }, label = { Text("Proteína alvo (g)") })
-		OutlinedTextField(deficitTarget.value, { deficitTarget.value = it }, label = { Text("Déficit alvo (kcal)") })
+		Text("Meta de Proteína")
+		Slider(
+			value = (proteinTarget.value.toFloatOrNull() ?: 150f),
+			onValueChange = { proteinTarget.value = it.toInt().toString() },
+			valueRange = 80f..240f,
+			colors = SliderDefaults.colors()
+		)
+		Text("${proteinTarget.value} g/dia")
+		Text("Déficit Calórico")
+		Slider(
+			value = (deficitTarget.value.toFloatOrNull() ?: 500f),
+			onValueChange = { deficitTarget.value = it.toInt().toString() },
+			valueRange = 200f..900f,
+			colors = SliderDefaults.colors()
+		)
+		Text("${deficitTarget.value} kcal/dia")
 		Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
 			Text("Usar Health Connect (quando disponível)")
 			Switch(checked = useHC.value, onCheckedChange = { useHC.value = it }, colors = SwitchDefaults.colors())
