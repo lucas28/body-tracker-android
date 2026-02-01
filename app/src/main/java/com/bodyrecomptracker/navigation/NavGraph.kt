@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import com.bodyrecomptracker.feature.dashboard.DashboardScreen
 import com.bodyrecomptracker.feature.history.HistoryScreen
 import com.bodyrecomptracker.feature.onboarding.OnboardingScreen
