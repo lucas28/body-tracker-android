@@ -21,6 +21,8 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun bodyProfileDao(): BodyProfileDao
 	abstract fun mealDao(): MealDao
 	abstract fun workoutDao(): WorkoutDao
+	abstract fun appSettingsDao(): AppSettingsDao
+	abstract fun weightLogDao(): WeightLogDao
 
 	companion object {
 		@Volatile private var INSTANCE: AppDatabase? = null
