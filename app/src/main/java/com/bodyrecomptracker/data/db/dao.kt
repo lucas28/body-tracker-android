@@ -16,6 +16,26 @@ interface BodyProfileDao {
 }
 
 @Dao
+interface AppSettingsDao {
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun upsert(settings: AppSettings)
+
+	@Query("SELECT * FROM AppSettings WHERE id = 1")
+	fun observe(): Flow<AppSettings?>
+}
+
+@Dao
+interface WeightLogDao {
+	@Insert
+	suspend fun insert(entry: WeightLog): Long
+
+	@Query("SELECT * FROM WeightLog WHERE epochDay BETWEEN :start AND :end ORDER BY epochDay DESC")
+	fun observeBetween(start: Long, end: Long): Flow<List<WeightLog>>
+
+	@Query("SELECT * FROM WeightLog ORDER BY epochDay DESC LIMIT 1")
+	suspend fun findLatest(): WeightLog?
+}
+@Dao
 interface MealDao {
 	@Insert
 	suspend fun insert(meal: MealEntry): Long

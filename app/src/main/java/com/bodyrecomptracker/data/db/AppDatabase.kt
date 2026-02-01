@@ -10,7 +10,9 @@ import androidx.room.RoomDatabase
 		BodyProfile::class,
 		MealEntry::class,
 		WorkoutSession::class,
-		ExerciseSet::class
+		ExerciseSet::class,
+		AppSettings::class,
+		WeightLog::class
 	],
 	version = 1,
 	exportSchema = false

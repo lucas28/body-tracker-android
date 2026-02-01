@@ -41,3 +41,17 @@ data class ExerciseSet(
 	val reps: Int
 )
 
+@Entity
+data class AppSettings(
+	@PrimaryKey val id: Long = 1,
+	val proteinTargetGrams: Int = 150,
+	val deficitTargetKcal: Int = 500,
+	val useHealthConnect: Boolean = false
+)
+
+@Entity
+data class WeightLog(
+	@PrimaryKey(autoGenerate = true) val id: Long = 0,
+	val epochDay: Long,
+	val weightKg: Double
+)

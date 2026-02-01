@@ -38,6 +38,8 @@ fun MealsScreen() {
 	var mealName by remember { mutableStateOf("") }
 	var mealKcal by remember { mutableStateOf("") }
 	var mealProtein by remember { mutableStateOf("") }
+	var mealCarbs by remember { mutableStateOf("") }
+	var mealFat by remember { mutableStateOf("") }
 
 	LazyColumn(
 		modifier = Modifier
@@ -50,9 +52,13 @@ fun MealsScreen() {
 			OutlinedTextField(mealName, { mealName = it }, label = { Text("Nome") })
 			OutlinedTextField(mealKcal, { mealKcal = it }, label = { Text("Calorias (kcal)") })
 			OutlinedTextField(mealProtein, { mealProtein = it }, label = { Text("Proteína (g)") })
+			OutlinedTextField(mealCarbs, { mealCarbs = it }, label = { Text("Carboidratos (g)") })
+			OutlinedTextField(mealFat, { mealFat = it }, label = { Text("Gorduras (g)") })
 			Button(onClick = {
 				val kcal = mealKcal.toIntOrNull() ?: 0
 				val prot = mealProtein.toDoubleOrNull() ?: 0.0
+				val carbs = mealCarbs.toDoubleOrNull() ?: 0.0
+				val fat = mealFat.toDoubleOrNull() ?: 0.0
 				if (mealName.isNotBlank() && kcal > 0) {
 					scope.launch {
 						db.mealDao().insert(
@@ -61,13 +67,15 @@ fun MealsScreen() {
 								name = mealName,
 								calories = kcal,
 								proteinGrams = prot,
-								carbsGrams = 0.0,
-								fatGrams = 0.0
+								carbsGrams = carbs,
+								fatGrams = fat
 							)
 						)
 						mealName = ""
 						mealKcal = ""
 						mealProtein = ""
+						mealCarbs = ""
+						mealFat = ""
 					}
 				}
 			}) { Text("Salvar refeição") }
