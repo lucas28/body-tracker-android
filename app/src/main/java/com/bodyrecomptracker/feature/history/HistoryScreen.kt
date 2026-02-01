@@ -20,14 +20,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.bodyrecomptracker.data.db.AppDatabase
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HistoryScreen(onBack: () -> Unit) {
 	val ctx = LocalContext.current
 	val db = AppDatabase.get(ctx)
-	val today = LocalDate.now().toEpochDay()
-	val mealsToday = db.mealDao().observeMealsForDay(today).collectAsState(initial = emptyList()).value
-	val sessionsToday = db.workoutDao().observeSessionsForDay(today).collectAsState(initial = emptyList()).value
+	val todayEpoch = LocalDate.now().toEpochDay()
+	val start14 = LocalDate.now().minusDays(13).toEpochDay()
+	val meals14 = db.mealDao().observeMealsBetween(start14, todayEpoch).collectAsState(initial = emptyList()).value
+	val sessions14 = db.workoutDao().observeSessionsBetween(start14, todayEpoch).collectAsState(initial = emptyList()).value
 
 	LazyColumn(
 		modifier = Modifier
@@ -38,14 +40,18 @@ fun HistoryScreen(onBack: () -> Unit) {
 			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {
-		item { Text("Histórico de Progressão") }
-		item { Text("Refeições de hoje:") }
-		items(mealsToday, key = { it.id }) { meal ->
-			Text("- ${meal.name}: ${meal.calories} kcal, ${meal.proteinGrams.toInt()} g proteína")
+		item { Text("Histórico (últimos 14 dias)") }
+		items((0..13).map { todayEpoch - it }) { day ->
+			val date = LocalDate.ofEpochDay(day)
+			val fmt = date.format(DateTimeFormatter.ofPattern("dd/MM"))
+			val mealsDay = meals14.filter { it.epochDay == day }
+			val cal = mealsDay.sumOf { it.calories }
+			val trainedSessions = sessions14.filter { it.epochDay == day }
+			val trained = trainedSessions.isNotEmpty()
+			Text("$fmt • Calorias: $cal • Treino: ${if (trained) trainedSessions.first().type else "—"}")
 			Spacer(Modifier.height(4.dp))
 		}
 		item { Spacer(Modifier.height(12.dp)) }
-		item { Text("Treinos de hoje: ${sessionsToday.size}") }
 		item { Button(onClick = onBack) { Text("Voltar") } }
 	}
 }

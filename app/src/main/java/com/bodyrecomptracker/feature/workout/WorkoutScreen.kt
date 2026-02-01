@@ -145,8 +145,6 @@ fun WorkoutScreen(onBack: () -> Unit) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.statusBarsPadding()
-			.navigationBarsPadding()
 			.imePadding()
 			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -165,6 +163,7 @@ fun WorkoutScreen(onBack: () -> Unit) {
 			modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f),
+			contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 96.dp),
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			items(inputs, key = { it.name }) { item ->
@@ -209,7 +208,9 @@ fun WorkoutScreen(onBack: () -> Unit) {
 		}
 		Button(onClick = {
 			scope.launch {
-				val sessionId = db.workoutDao().insertSession(WorkoutSession(epochDay = currentDate.toEpochDay(), type = "PPL"))
+				val sessionId = db.workoutDao().insertSession(
+					WorkoutSession(epochDay = currentDate.toEpochDay(), type = routines[selectedRoutineIdx].title)
+				)
 				val sets = inputs.mapNotNull { input ->
 					val w = input.weightKg.toDoubleOrNull() ?: 0.0
 					val r = input.reps.toIntOrNull() ?: 0

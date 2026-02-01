@@ -23,6 +23,9 @@ interface MealDao {
 	@Query("SELECT * FROM MealEntry WHERE epochDay = :epochDay")
 	fun observeMealsForDay(epochDay: Long): Flow<List<MealEntry>>
 
+	@Query("SELECT * FROM MealEntry WHERE epochDay BETWEEN :start AND :end")
+	fun observeMealsBetween(start: Long, end: Long): Flow<List<MealEntry>>
+
 	@Query("DELETE FROM MealEntry WHERE id = :id")
 	suspend fun deleteById(id: Long)
 }
@@ -37,6 +40,9 @@ interface WorkoutDao {
 
 	@Query("SELECT * FROM WorkoutSession WHERE epochDay = :epochDay")
 	fun observeSessionsForDay(epochDay: Long): Flow<List<WorkoutSession>>
+
+	@Query("SELECT * FROM WorkoutSession WHERE epochDay BETWEEN :start AND :end")
+	fun observeSessionsBetween(start: Long, end: Long): Flow<List<WorkoutSession>>
 
 	@Query("SELECT * FROM ExerciseSet WHERE sessionId = :sessionId")
 	fun observeSets(sessionId: Long): Flow<List<ExerciseSet>>

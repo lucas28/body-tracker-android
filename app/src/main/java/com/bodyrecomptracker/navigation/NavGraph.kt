@@ -97,7 +97,8 @@ private fun AppNavHost(
 ) {
 	NavHost(
 		navController = navController,
-		startDestination = AppRoute.Onboarding.name
+		startDestination = AppRoute.Onboarding.name,
+		modifier = androidx.compose.ui.Modifier.padding(innerPadding)
 	) {
 		composable(AppRoute.Onboarding.name) {
 			OnboardingScreen(onFinished = {
